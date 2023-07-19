@@ -15,32 +15,55 @@ export class TeamsBot extends TeamsActivityHandler {
     super();
 
 
-    const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
-
-
-    const client = new OpenAIClient(
-      "https://graphgptdev.openai.azure.com/", 
-      new AzureKeyCredential("ace339cc69c14d8eadd5410d4e485f72")
-    );
-
 
     this.onMessage(async (context, next) => {
       console.log("Running with Message Activity.");
 
       let txt = context.activity.text;
    
+      const axios = require('axios');
+      let data = JSON.stringify({
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are an AI assistant that helps people find information."
+          },
+          {
+            "role": "user",
+            "content": "hello world"
+          }
+        ],
+        "max_tokens": 800,
+        "temperature": 0,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "top_p": 1,
+        "stop": null
+      });
+      
+      let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://1ws3s3.openai.azure.com/openai/deployments/gpt35qna/chat/completions?api-version=2023-03-15-preview',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'api-key': '34faa5e8993d442d80b5c4d25cae5ee2'
+        },
+        data : data
+      };
+      
+      axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      
 
-     const { choices } = await client.getCompletions(
-  "text-davinci-003", // assumes a matching model deployment or model name
-  [txt])
+ 
 
-
-
-  for (const choice of choices) {
-    console.log(choices.choice.text);
-  }
-
-      await context.sendActivity(choices.Text);
+     // await context.sendActivity(choices.Text);
 
       // By calling next() you ensure that the next BotHandler is run.
       await next();
