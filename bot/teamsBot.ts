@@ -15,7 +15,7 @@ export class TeamsBot extends TeamsActivityHandler {
     super();
 
     const configuration = new Configuration({
-      apiKey: config.openaiApiKey,
+      apiKey: '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',
     });
     const openai = new OpenAIApi(configuration);
 
