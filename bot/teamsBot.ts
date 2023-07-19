@@ -14,29 +14,33 @@ export class TeamsBot extends TeamsActivityHandler {
   constructor() {
     super();
 
-    const configuration = new Configuration({
-      apiKey: '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',
-    });
-    const openai = new OpenAIApi(configuration);
+
+    const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
+
+
+    const client = new OpenAIClient(
+      "https://graphgptdev.openai.azure.com/", 
+      new AzureKeyCredential("ace339cc69c14d8eadd5410d4e485f72")
+    );
+
 
     this.onMessage(async (context, next) => {
       console.log("Running with Message Activity.");
 
       let txt = context.activity.text;
-      const removedMentionText = TurnContext.removeRecipientMention(context.activity);
-      if (removedMentionText) {
-        // Remove the line break
-        txt = removedMentionText.toLowerCase().replace(/\n|\r/g, "").trim();
-      }
+   
 
-      const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: txt,
-        temperature: 0,
-        max_tokens: 2048,
-      });
+     const { choices } = await client.getCompletions(
+  "text-davinci-003", // assumes a matching model deployment or model name
+  [txt])
 
-      await context.sendActivity(response.data.choices[0].text);
+
+
+  for (const choice of choices) {
+    console.log(choices.choice.text);
+  }
+
+      await context.sendActivity(choices.Text);
 
       // By calling next() you ensure that the next BotHandler is run.
       await next();
