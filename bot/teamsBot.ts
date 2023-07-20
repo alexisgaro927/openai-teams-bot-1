@@ -30,7 +30,7 @@ export class TeamsBot extends TeamsActivityHandler {
           },
           {
             "role": "user",
-            "content": "hello world"
+            "content": txt
           }
         ],
         "max_tokens": 800,
@@ -52,18 +52,24 @@ export class TeamsBot extends TeamsActivityHandler {
         data : data
       };
       
+      let message;
+
       axios.request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        const message = response.data.choices[0].message.content; // Extract the message from the response
+        console.log(message)
+        return context.sendActivity(message); // Send the message here, inside the .then() block
+  
       })
       .catch((error) => {
         console.log(error);
       });
+
       
 
  
 
-     // await context.sendActivity(choices.Text);
+     
 
       // By calling next() you ensure that the next BotHandler is run.
       await next();
